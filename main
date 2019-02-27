@@ -1,0 +1,25 @@
+#include <iostream>
+#include<math.h>
+
+double sq(double x)
+{
+    return x*x;
+}
+
+//Find thesquarerootof'num'bystarting the iteration from 'x0'
+double sqrt_newton(double num, double x0)
+{
+  for (int i = 0; i < 10; ++i) {
+    double x1 = x0-(sq(x0)-num)/(2.0*x0);
+    std::cout.precision(16);
+    std::cout << "There is the solution: " << x1 << "\n";
+    x0 = x1;
+    
+  }
+
+}
+
+
+int main(int, char**) {
+    sqrt_newton(612, 10);
+}
