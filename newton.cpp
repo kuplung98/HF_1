@@ -1,5 +1,5 @@
 #include <iostream>
-#include<math.h>
+#include<cmath>
 
 double sq(double x)
 {
@@ -12,7 +12,7 @@ double sqrt_newton(double num, double x0)
   int i = 0;
   double x1 = 0.0;
 
-  while(i <= 100){
+  while(i <= 10){
     x1 = x0-(sq(x0)-num)/(2.0*x0);
     if (abs(x1-x0) <= 1e-12)
     {    
@@ -25,11 +25,16 @@ double sqrt_newton(double num, double x0)
         i++;
     }
   }
-
+  return x1;
 }
 
 int main(int, char**) {
    std::cout.precision(16);
    double g = sqrt_newton(612, 10);
+   double s0 = 24.738633753705963298;
+   std::cout<<"The squareroot of 612 is: "<<s0<< "\n\n";
+
    std::cout<<"The solution is: "<< g <<"\n";
+   std::cout<<"Difference from the test value.:"<< s0-g << "\n";
+
 }
