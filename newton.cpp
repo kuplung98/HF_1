@@ -14,7 +14,7 @@ double sqrt_newton(double num, double x0)
 
   while(i <= 10){
     x1 = x0-(sq(x0)-num)/(2.0*x0);
-    if (abs(x1-x0) <= 1e-12)
+    if (std::abs(x1-x0) <= 1e-12)
     {    
         return x1;
     }
