@@ -30,25 +30,43 @@ std::array<double, 2> linear(std::vector<double> const& V,std::vector<double> co
     double c = std::accumulate(V.begin(), V.end(), 0.0, f2);
     double m = r/c;
     double b = n1-m*n;
-    std::array<double, 2> A = {m, b};
-
-    return A;
+    
+    return std::array<double, 2>{m, b};
 }
 
 int main(int, char**) {
     std::vector<double> X={0.0, 1.0, 2.0, 3.0, 4.0};
     std::vector<double> Y={0.0, 1.0, 2.0, 3.0, 4.0};
 
+    //Test vectors:
+    std::vector<double> Xt={0.0, 1.0, 2.0, 3.0, 4.0};
+    std::vector<double> Yt={0.0, 1.0, 2.0, 3.0, 4.0};
+
     std::array<double, 2> S0 = {1.0, 0.0};
+    std::array<double, 2> s = linear(X,Y);
+   
 
     std::cout<<"Test vectors: \n";
-    std::cout<<"X = {0.0, 1.0, 2.0, 3.0, 4.0, 5.0}"<<"\n"<< "Y = {0.0, 1.0, 2.0, 3.0, 4.0, 5.0}"<<"\n";
+    std::cout<<"X = {";
+    for (auto e : Xt)
+    {
+        std::cout<< e <<" ";
+    }
+    std::cout<<"}";
+    std::cout<<"\n";
+    std::cout<<"Y = {";
+    for (auto e : Yt)
+    {
+        std::cout<< e <<" ";
+    }
+    std::cout<<"}";
+    std::cout<<"\n";
     std::cout<<"Test values: "<<"\n";
     std::cout<<"Steepness: " << S0[0] <<"\n";
     std::cout<<"Intersection of the axis: "<< S0[1] <<"\n\n";
     std::cout<<"The solution is: \n";
-    std::cout<<"Steepness: " << linear(X,Y)[0] <<"\n";
-    std::cout<<"Difference from the test value.:"<< S0[0]-linear(X,Y)[0] << "\n"; 
-    std::cout<<"Intersection of the axis: "<< linear(X,Y)[1] <<"\n";
-    std::cout<<"Difference from the test value.:"<< S0[1]-linear(X,Y)[1] << "\n";
+    std::cout<<"Steepness: " << s[0] <<"\n";
+    std::cout<<"Difference from the test value.:"<< S0[0]-s[0] << "\n"; 
+    std::cout<<"Intersection of the axis: "<< s[1] <<"\n";
+    std::cout<<"Difference from the test value.:"<< S0[1]-s[1] << "\n";
 }
