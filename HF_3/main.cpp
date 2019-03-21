@@ -66,7 +66,13 @@ int main(int, char**) {
     std::cout<<"Intersection of the axis: "<< S0[1] <<"\n\n";
     std::cout<<"The solution is: \n";
     std::cout<<"Steepness: " << s[0] <<"\n";
-    std::cout<<"Difference from the test value.:"<< S0[0]-s[0] << "\n"; 
+    if(std::abs(S0[0]-s[0])> 1e-10)
+    {
+        std::cout << "Incorrect result! \n";
+    };
     std::cout<<"Intersection of the axis: "<< s[1] <<"\n";
-    std::cout<<"Difference from the test value.:"<< S0[1]-s[1] << "\n";
+    if(std::abs(S0[1]-s[1])> 1e-10)
+    {
+        std::cout << "Incorrect result! \n";
+    };
 }
