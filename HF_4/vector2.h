@@ -1,3 +1,9 @@
+#include <iostream>
+#include <cmath>
+#include <vector>
+#include <string>
+#include <sstream>
+
 template<typename T>
 struct Vector2
 {
@@ -59,13 +65,6 @@ Vector2<T>  operator/( Vector2<T>  const& a, T b)
 }
 
 template<typename T>
-std::ostream& operator<<( std::ostream& o, Vector2<T> const& v)
-{
-    o << v.x << "  " << v.y;
-    return o;
-}
-
-template<typename T>
 T dot(Vector2<T> const& a, Vector2<T> const& b)
 {
     return a.x * b.x + a.y * b.y;
@@ -83,6 +82,7 @@ T sqlength(Vector2<T> const& a)
     return sq(a.x) + sq(a.y) ;
 }
 
+
 template<typename T>
 T length(Vector2<T> const& a)
 {
@@ -92,23 +92,36 @@ T length(Vector2<T> const& a)
 template<typename T>
 Vector2<T> normalize(Vector2<T> const& a)
 {
-    T b = length(a);
-    return Vector2<T> { a.x / b, a.y / b};
+    return a / length(a);
 }
 
 template<typename T>
-std::istream& operator>>( std::istream& i, Vector2<T>& v)
+std::ostream& operator<< (std::ostream& o, Vector2<T> const& v)
 {
-   i >> v.x;
-   i >> v.y;
-   return i;
+    o << v.x << ","<< v.y;
+	return o;
 }
 
 template<typename T>
-std::istream& operator>>( std::istream& i, T n)
-{
-   i >> n;
-   return i;
-}
+std::istream& operator>> (std::istream& s, Vector2<T> & v)
+	{
+		const auto state= s.rdstate();
+		const auto pos= s.tellg();
+
+		std::string tmp;
+		std::getline(s, tmp);
+		std::stringstream ss(tmp);
+		
+			std::getline(ss, tmp, ','); 
+			if(tmp.size() == 0){ s.seekg(pos); s.setstate(state); return s; }
+			v.x = std::stod(tmp);
+            std::getline(ss, tmp); 
+            if(tmp.size() == 0){ s.seekg(pos); s.setstate(state); return s; }
+            v.y = std::stod(tmp);
+		
+		return s;
+	
+	}
+
 
 
