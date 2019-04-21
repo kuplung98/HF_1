@@ -109,19 +109,19 @@ std::istream& operator>> (std::istream& s, Vector2<T> & v)
 		const auto pos= s.tellg();
 
 		std::string tmp;
-		std::getline(s, tmp);
-		std::stringstream ss(tmp);
 		
-			std::getline(ss, tmp, ','); 
-			if(tmp.size() == 0){ s.seekg(pos); s.setstate(state); return s; }
-			v.x = std::stod(tmp);
-            std::getline(ss, tmp); 
-            if(tmp.size() == 0){ s.seekg(pos); s.setstate(state); return s; }
-            v.y = std::stod(tmp);
+		std::getline(s, tmp, ','); 
+		if(tmp.size() == 0){ s.seekg(pos); s.setstate(state); return s; }
+		v.x = std::stod(tmp);
+
+        std::getline(s, tmp); 
+        if(tmp.size() == 0){ s.seekg(pos); s.setstate(state); return s; }
+        v.y = std::stod(tmp);
+
+        std::stringstream ss(tmp);
 		
 		return s;
 	
 	}
-
 
 
