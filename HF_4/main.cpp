@@ -130,22 +130,24 @@ int main(int, char**) {
         std::cout << "Incorrect result of normalized! \n\n";
     };
 
-    // The iostream test:
+    // The iostream test: 
+    Vector2<double> V3={2.3, 5.1 };
+    Vector2<double> V4={7.5, 13.7 };
     {
-		std::string str("2,5");
+		std::string str("2.3,5.1");
 		std::stringstream oo1;
-		oo1 << V1;
+		oo1 << V3;
 		std::string o1 = oo1.str();
 		bool b = o1 == str;
 		if(b != true){std::cout << "Incorrect ostream! \n\n"; };
 	}
 
 	{
-		std::string str("7,13");
+		std::string str("7.5,13.7");
 		std::stringstream oo1(str);
 		Vector2<double> p;
 		oo1 >> p;
-		if(std::abs(V2.x-p.x) > 1e-10 || std::abs(V2.y-p.y) > 1e-10 ){ std::cout << "Incorrect istream! \n\n";    }
+		if(std::abs(V4.x-p.x) > 1e-10 || std::abs(V4.y-p.y) > 1e-10 ){ std::cout << "Incorrect istream! \n\n";    }
 	}
 
 
