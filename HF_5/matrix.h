@@ -7,9 +7,35 @@
 #include <string>
 #include <sstream>
 
+//Helper functions:
+namespace detail
+{
+	template<typename M1, typename M2, typename F>
+	void transform_matrix1(M1 const& m1, M2& m2, F f)
+	{
+		std::transform(m1.cbegin(), m1.cend(), m2.begin(), f);
+	}
+
+	template<typename M1, typename M2, typename M3, typename F>
+	void transform_matrix2(M1 const& m1, M2 const& m2, M3& m3, F f)
+	{
+		std::transform(m1.cbegin(), m1.cend(), m2.cbegin(), m3.begin(), f);
+	}
+}
+
+//Common lambdas:
+inline auto add = [](auto const& x, auto const& y){ return x + y; };
+inline auto sub = [](auto const& x, auto const& y){ return x - y; };
+
 // Helper structs:
 struct Idx1{}; 
 struct Idx2{};
+
+template<typename T> 
+T sq(T a)
+{
+    return a * a;
+}
 
 template<typename T>
 class Matrix
@@ -19,11 +45,6 @@ class Matrix
    	std::vector<T> data;
 	
 public:
-
-   	T sq(T a)
-	{
-    return a * a;
-	}
 
 	//2D operator for reading and writing:
 	T&       operator()( int i, int j )      
@@ -43,7 +64,7 @@ public:
 	Matrix( Matrix && ) = default;
 	Matrix():N{0}
     {
-        data.resize(static_cast<size_t>(sq(N)));
+        data.resize(sq(N));
 	}
 
 	//Copy and Move assignment operators implemented by the compiler:
@@ -52,11 +73,12 @@ public:
 
 	//Constructs from function :
 	template<typename F>
-	Matrix(Idx1, F f, int N)
+	Matrix(Idx1, F f, int n)
 	{
-		data.resize(sq(N));
+		N = n;
+		data.resize(sq(n));
 
-    	for(int j=0;j<=sq(N)-1;j++)
+    	for(int j=0;j < size();j++)
     	{
         	data[j]=f(j);
     	}
@@ -64,20 +86,19 @@ public:
 	}
 
 	template<typename F>
-	Matrix(Idx2, F f, int N)
+	Matrix (Idx2, F f, int n)
 	{
-		data.resize(sq(N));
+		N = n;
+		data.resize(sq(n));
 
-    	for(int i=0;i<=N-1;i++)
+    	for(int i=0;i<=n-1;i++)
     	{
-        	for(int j=0;j<=N-1;j++)
+        	for(int j=0;j<=n-1;j++)
         	{
-            	data[N*i+j]=f(i,j);
+            	data[n*i+j]=f(i,j);
         	}
 		}
 	}
-
-	
 
 	//Construct from initializer list:
 	Matrix(int n, std::initializer_list<T> const& il ) :N{n}, data{il}
@@ -95,6 +116,11 @@ public:
 	{
 		return static_cast<int>(data.size());
 	}
+
+	int n()const
+	{
+		return N;
+	}	
 
 	//begin and end for compatibility with STL:
 	auto begin()
@@ -120,29 +146,28 @@ public:
 	//Add assignment operators:
 	Matrix<T>& operator+= (Matrix<T> const& cpy)
 	{
-		*this = Matrix<T>(Idx1{}, [&](auto i){ return (*this)[i] + cpy[i]; }, std::sqrt((*this).size()));
+		detail::transform_matrix2(*this, cpy, *this, add);
 		return *this;
 	}
 
 	//Subtract assignment operators:
 	Matrix<T>& operator-= (Matrix<T> const& cpy)
 	{
-		*this = Matrix<T>(Idx1{}, [&](auto i){ return (*this)[i] - cpy[i]; }, std::sqrt((*this).size()));
+		detail::transform_matrix2(*this, cpy, *this, sub);
 		return *this;
 	}
-
 
 	//Multiplication by scalar:
 	Matrix<T>& operator*= (T const& scl)
 	{
-		*this = Matrix<T>(Idx1{}, [&](auto i){ return (*this)[i] * scl; }, std::sqrt((*this).size()));
+		detail::transform_matrix1(*this, *this, [=](T const& x){ return x * scl;} );
 		return *this;
 	}
 
 	//Division by scalar:
 	Matrix<T>& operator/= (T const& scl)
 	{
-		*this = Matrix<T>(Idx1{}, [&](auto i){ return (*this)[i] / scl; }, std::sqrt((*this).size()));
+		detail::transform_matrix1(*this, *this, [=](T const& x){ return x / scl;} );
 		return *this;
 	}
 
@@ -151,28 +176,28 @@ public:
 	friend
 	Matrix<T> operator+( Matrix<T>  const& m1, Matrix<T>  const& m2)
 	{
-		return Matrix<T>(Idx1{}, [&](auto i){ return m1[i] + m2[i]; }, std::sqrt(m1.size()));	
+		return Matrix<T>(Idx1{}, [&](auto i){ return m1[i] + m2[i]; }, m1.n());	
 	}
 
 	friend
 	Matrix<T>&& operator+( Matrix<T>&& m1, Matrix<T> const& m2 )
 	{
-		m1 = Matrix<T>(Idx1{}, [&](auto i){ return m1[i] + m2[i]; }, std::sqrt(m2.size()));
-		return std::move(m1);
+		detail::transform_matrix2(m1, m2, m1, add);
+		return  std::move(m1);	
 	}
 
 	friend
 	Matrix<T>&& operator+( Matrix<T> const& m1, Matrix<T>&& m2 )
 	{
-		m2 = Matrix<T>(Idx1{}, [&](auto i){ return m1[i] + m2[i]; }, std::sqrt(m1.size()));
-		return std::move(m2);
+		detail::transform_matrix2(m1, m2, m2, add);
+		return  std::move(m2);	
 	}
 
 	friend
 	Matrix<T>&& operator+( Matrix<T>&& m1, Matrix<T>&& m2 )
 	{
-		m1 = Matrix<T>(Idx1{}, [&](auto i){ return m1[i] + m2[i]; }, std::sqrt(m1.size()));
-		return std::move(m1);
+		detail::transform_matrix2(m1, m2, m1, add);
+		return  std::move(m1);	
 	}
 
 	// - operator:
@@ -180,28 +205,28 @@ public:
 	friend
 	Matrix<T> operator-( Matrix<T> const& m1, Matrix<T> const& m2 )
 	{
-		return Matrix<T>(Idx1{}, [&](auto i){ return m1[i] - m2[i]; }, std::sqrt(m1.size()));
+		return Matrix<T>(Idx1{}, [&](auto i){ return m1[i] - m2[i]; },m1.n());
 	}
 
 	friend
 	Matrix<T>&& operator-( Matrix<T>&& m1, Matrix<T> const& m2 )
 	{
-		m1 = Matrix<T>(Idx1{}, [&](auto i){ return m1[i] - m2[i]; }, std::sqrt(m2.size()));
-		return std::move(m1);
+		detail::transform_matrix2(m1, m2, m1, sub);
+		return  std::move(m1);	
 	}
 
 	friend
 	Matrix<T>&& operator-( Matrix<T> const& m1, Matrix<T>&& m2 )
 	{
-		m2 = Matrix<T>(Idx1{}, [&](auto i){ return m1[i] - m2[i]; }, std::sqrt(m1.size()));
-		return std::move(m2);
+		detail::transform_matrix2(m1, m2, m2, sub);
+		return  std::move(m2);	
 	}
 
 	friend
 	Matrix<T>&& operator-( Matrix<T>&& m1, Matrix<T>&& m2 )
 	{
-		m1 = Matrix<T>(Idx1{}, [&](auto i){ return m1[i] - m2[i]; }, std::sqrt(m1.size()));
-		return std::move(m1);
+		detail::transform_matrix2(m1, m2, m1, sub);
+		return  std::move(m1);	
 	}
 
 	// * operator (by scalar):
@@ -209,28 +234,26 @@ public:
 	friend
 	Matrix<T> operator*(Matrix<T> const& m, T const& scl)
 	{
-		return Matrix<T>(Idx1{}, [&](auto i){ return m[i] * scl; }, std::sqrt(m.size()));
+		return Matrix<T>(Idx1{}, [&](auto i){ return m[i] * scl; }, m.n());
 	}
 
 	friend
 	Matrix<T>&& operator*(Matrix<T>&& m, T const& scl)
 	{
-		m = Matrix<T>(Idx1{}, [&](auto i){ return m[i] * scl; }, std::sqrt(m.size()));
+		detail::transform_matrix1(m, m, [=](T const& x){ return x * scl;} );
 		return std::move(m);
 	}
 
 	friend
 	Matrix<T> operator*(T const& scl, Matrix<T> const& m)
 	{
-		Matrix<T> result; result.data.resize(m.data.size());
-		return Matrix<T>(Idx1{}, [&](auto i){ return scl * m[i] ; }, std::sqrt(m.size()));
+		return Matrix<T>(Idx1{}, [&](auto i){ return scl * m[i] ; }, m.n());
 	}
 
 	friend
 	Matrix<T>&& operator*(T const& scl, Matrix<T>&& m)
 	{
-		
-		m = Matrix<T>(Idx1{}, [&](auto i){ return scl * m[i] ; }, std::sqrt(m.size()));
+		detail::transform_matrix1(m, m, [=](T const& x){ return x * scl;} );
 		return std::move(m);
 	}
 
@@ -239,14 +262,13 @@ public:
 	friend
 	Matrix<T> operator/(Matrix<T> const& m, T const& scl)
 	{
-		Matrix<T> result; result.data.resize(m.data.size());
-		return Matrix<T>(Idx1{}, [&](auto i){ return m[i] / scl; }, std::sqrt(m.size()));
+		return Matrix<T>(Idx1{}, [&](auto i){ return m[i] / scl; }, m.n());
 	}
 
 	friend
 	Matrix<T>&& operator/(Matrix<T>&& m, T const& scl)
 	{
-		m = Matrix<T>(Idx1{}, [&](auto i){ return m[i] / scl; }, std::sqrt(m.size()));
+		detail::transform_matrix1(m, m, [=](T const& x){ return x / scl;} );
 		return std::move(m);
 	}
 
@@ -255,8 +277,8 @@ public:
 	friend
 	Matrix<T> operator*(Matrix<T> const& m1, Matrix<T> const& m2)
 	{
-		int N = std::sqrt(m1.size());
-		auto m = Matrix<T> (Idx2{}, [&](int i, int j)
+		int N = m1.n();
+		return Matrix<T> (Idx2{}, [&](int i, int j)
 		{
 			T sum = 0.0;
 			for(int k = 0; k<N; ++k)
@@ -264,59 +286,81 @@ public:
 				sum += m1(i, k) * m2(k, j);
 			}
 			return sum;
-		}, N);
-
-		return m;
+		},  N);
 	}
 
 	friend
 	Matrix<T>&& operator*(Matrix<T> && m1, Matrix<T> const& m2)
 	{
-		int N = std::sqrt(m2.size());
-		m1 = Matrix<T> (Idx2{}, [&](int i, int j)
-		{
-			T sum = 0.0;
-			for(int k = 0; k<N; ++k)
-			{
-				sum += m1(i, k) * m2(k, j);
+		int N = m1.n();
+		std::vector<T> v(m2.size());
+		for(int i=0;i<=N-1;i++)
+    	{
+        	for(int j=0;j<=N-1;j++)
+        	{
+				T sum = 0.0;
+				for(int k = 0; k<N; ++k)
+				{
+					sum += m1[N*i+k] * m2[k*N+j];
+				}
+				v[j]=sum;
 			}
-			return sum;
-		}, N);
-
-		return std::move(m1);
+			for(int j=0;j<=N-1;j++)
+			{
+				m1[N*i+j]=v[j];
+			}
+		}
+		return std::move(m1);	
 	}
 
 	friend
 	Matrix<T>&& operator*(Matrix<T> const& m1, Matrix<T> && m2)
 	{
-		int N = std::sqrt(m1.size());
-		m2 = Matrix<T> (Idx2{}, [&](int i, int j)
-		{
-			T sum = 0.0;
-			for(int k = 0; k<N; ++k)
-			{
-				sum += m1(i, k) * m2(k, j);
+		int N = m2.n();
+		std::vector<T> v(m1.size());
+		for(int i=0;i<=N-1;i++)
+    	{
+        	for(int j=0;j<=N-1;j++)
+        	{
+				T sum = 0.0;
+				for(int k = 0; k<N; ++k)
+				{
+					sum += m1[N*i+k] * m2[k*N+j];
+				}
+				v[N*i+j]=sum;
 			}
-			return sum;
-		}, N);
-
+		}
+		for(int i=0;i<=N-1;i++)
+    	{
+        	for(int j=0;j<=N-1;j++)
+        	{
+				m2[N*i+j]=v[N*i+j];
+			}
+		}	
 		return std::move(m2);
 	}
 
 	friend
 	Matrix<T>&& operator*(Matrix<T> && m1, Matrix<T> && m2)
 	{
-		int N = std::sqrt(m2.size());
-		m1 = Matrix<T> (Idx2{}, [&](int i, int j)
-		{
-			T sum = 0.0;
-			for(int k = 0; k<N; ++k)
-			{
-				sum += m1(i, k) * m2(k, j);
+		int N = m1.n();
+		std::vector<T> v(m2.size());
+		for(int i=0;i<=N-1;i++)
+    	{
+        	for(int j=0;j<=N-1;j++)
+        	{
+				T sum = 0.0;
+				for(int k = 0; k<N; ++k)
+				{
+					sum += m1[N*i+k] * m2[k*N+j];
+				}
+				v[j]=sum;
 			}
-			return sum;
-		}, N);
-
+			for(int j=0;j<=N-1;j++)
+			{
+				m1[N*i+j]=v[j];
+			}
+		}
 		return std::move(m1);
 	}
 
@@ -326,7 +370,7 @@ public:
 	std::ostream& operator<< (std::ostream& o, Matrix<T> const& m)
 	{
 		int n = m.size();
-		o<<std::sqrt(n)<<";";
+		o<< m.n() <<";";
 		if( n > 0 )
 		{
 			for(int i=0; i<=n-2; ++i)
