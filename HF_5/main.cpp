@@ -43,7 +43,7 @@ int main()
 		Matrix<double> a = {2,{3.1, 5.2, 9.3, 7.5}};
 		Matrix<double> b{ std::move(a) };
 		if(a.size() != 0)                            { err("move constructor test [src size]");             }
-		if(a.n() != 2)								{err("move constructor test [src dimension]");}
+		if(a.n() != 0)								{err("move constructor test [src dimension]");}
 		if(a.begin() != a.end())                     { err("move constructor test [src begin == src end]"); }
 		if(b.size() != 4)                            { err("move constructor test [size]");                 }
 		if(b.n() != 2)								{err("move constructor test [dimension]");}
@@ -95,12 +95,12 @@ int main()
 		Matrix<double> a = {2,{3.1, 5.2, 9.3, 7.5}};
 		Matrix<double> b;
 		b = std::move(a);
-		if(a.begin() != a.end())                     { err("assignment test [src begin == src end]"); }
-		if(a.size() != 0)                            { err("assignment test [src size]");             }
-		if(a.n() != 2)								{err("assignment test [src dimension]");}
-		if(b.size() != 4)                            { err("assignment test [size]");                 }
-		if(b.n() != 2)								{err("self assignment test [dimension]");}
-		if(b(0,0) != 3.1 || b(0,1) != 5.2 || b(1,0) != 9.3, b(1,1) != 7.5){ err("assignment test [elements]");             }
+		if(a.begin() != a.end())                     { err("move assignment test [src begin == src end]"); }
+		if(a.size() != 0)                            { err("move assignment test [src size]");             }
+		if(a.n() != 0)								{err("move assignment test [src dimension]");}
+		if(b.size() != 4)                            { err("move assignment test [size]");                 }
+		if(b.n() != 2)								{err("move assignment test [dimension]");}
+		if(b(0,0) != 3.1 || b(0,1) != 5.2 || b(1,0) != 9.3, b(1,1) != 7.5){ err("move assignment test [elements]");             }
 	}
 
 	//Test operator- (l-value, l-value)
@@ -130,7 +130,7 @@ int main()
 		Matrix<double> ref = {2,{1.0, 2.0, 2.0, 6.0}};
 		Matrix<double> res = std::move(a) - b;
 		if(a.size() != 0)                              { err("operator- test (r-value, l-value) [src size]");     }
-		if(a.n() != 2)								{err("operator- test (r-value, l-value) [src dimension]");}
+		if(a.n() != 0)								{err("operator- test (r-value, l-value) [src dimension]");}
 		if(b.size() != 4)                              { err("operator- test (r-value, l-value) [src size]");     }
 		if(b.n() != 2)								{err("operator- test (r-value, l-value) [src dimension]");}
 		if(res.size() != 4)                            { err("operator- test (r-value, l-value) [size]");         }
@@ -151,7 +151,7 @@ int main()
 		if(a.size() != 4)                              { err("operator- test (l-value, r-value) [src size]");     }
 		if(a.n() != 2)								{err("operator- test (l-value, r-value) [src dimension]");}
 		if(b.size() != 0)                              { err("operator- test (l-value, r-value) [src size]");     }
-		if(b.n() != 2)								{err("operator- test (l-value, r-value) [src dimension]");}
+		if(b.n() != 0)								{err("operator- test (l-value, r-value) [src dimension]");}
 		if(res.size() != 4)                            { err("operator- test (l-value, r-value) [size]");         }
 		if(res.n() != 2)								{err("operator- test (l-value, r-value) [dimension]");}
 		if(a[0] != 3.1 || a[1] != 5.2 || a[2] != 9.3 || a[3] != 7.5){ err("operator- test (l-value, r-value) [src elements]"); }
@@ -168,7 +168,7 @@ int main()
 		Matrix<double> ref = {2,{1.0, 2.0, 2.0, 6.0}};
 		Matrix<double> res = std::move(a) - std::move(b);
 		if(a.size() != 0)            { err("operator- test (r-value, r-value) [src size]"); }
-		if(a.n() != 2)				 {err("operator- test (r-value, r-value) [src dimension]");}
+		if(a.n() != 0)				 {err("operator- test (r-value, r-value) [src dimension]");}
 		if(b.size() != 4)            { err("operator- test (r-value, r-value) [src size]"); }
 		if(b.n() != 2)				 {err("operator- test (r-value, r-value) [src dimension]");}
 		if(res.size() != 4)          { err("operator- test (r-value, r-value) [size]");     }
@@ -206,7 +206,7 @@ int main()
 		Matrix<double> ref = {2,{5.2, 8.4, 16.6, 9.0}};
 		Matrix<double> res = std::move(a) + b;
 		if(a.size() != 0)                              { err("operator+ test (r-value, l-value) [src size]");     }
-		if(a.n() != 2)				 					{err("operator+ test (r-value, l-value) [src dimension]");}
+		if(a.n() != 0)				 					{err("operator+ test (r-value, l-value) [src dimension]");}
 		if(b.size() != 4)                              { err("operator+ test (r-value, l-value) [src size]");     }
 		if(b.n() != 2)				 				  {err("operator+ test (r-value, l-value) [src dimension]");}
 		if(b[0] != 2.1 || b[1] != 3.2 || b[2] != 7.3 || b[3] != 1.5){ err("operator+ test (r-value, l-value) [src elements]"); }
@@ -228,7 +228,7 @@ int main()
 		if(a.n() != 2)				 					{err("operator+ test (l-value, r-value) [src dimension]");}
         if(a[0] != 3.1 || a[1] != 5.2 || a[2] != 9.3 || a[3] != 7.5){ err("operator+ test (l-value, r-value) [src elements]"); }
 		if(b.size() != 0)                              { err("operator+ test (l-value, r-value) [src size]");     }
-		if(b.n() != 2)				 				  {err("operator+ test (l-value, r-value) [src dimension]");}
+		if(b.n() != 0)				 				  {err("operator+ test (l-value, r-value) [src dimension]");}
 		if(res.size() != 4)                            { err("operator+ test (l-value, r-value) [size]");         }
 		if(res.n() != 2)			 				{err("operator+ test (l-value, r-value) [dimension]");}
 		if(std::abs(ref[0]-res[0]) > 1e-15 ||
@@ -244,7 +244,7 @@ int main()
 		Matrix<double> ref = {2,{5.2, 8.4, 16.6, 9.0}};
 		Matrix<double> res = std::move(a) + std::move(b);
 		if(a.size() != 0)                              { err("operator+ test (r-value, r-value) [src size]");     }
-		if(a.n() != 2)				 					{err("operator+ test (r-value, r-value) [src dimension]");}
+		if(a.n() != 0)				 					{err("operator+ test (r-value, r-value) [src dimension]");}
 		if(b.size() != 4)                              { err("operator+ test (r-value, r-value) [src size]");     }
 		if(b.n() != 2)				 				  {err("operator+ test (r-value, r-value) [src dimension]");}
 		if(res.size() != 4)                            { err("operator+ test (r-value, r-value) [size]");         }
@@ -325,7 +325,7 @@ int main()
 		Matrix<double> ref = {2,{6.2, 10.4, 18.6, 15.0}};
 		Matrix<double> res = std::move(a) * 2.0;
 		if(a.size()   != 0)          { err("operator* test (r-value, scalar) [src size]");     }
-		if(a.n() != 2)				 {err("operator* test (r-value, scalar) [src dimension]");}
+		if(a.n() != 0)				 {err("operator* test (r-value, scalar) [src dimension]");}
 		if(res.size() != 4)          { err("operator* test (r-value, scalar) [size]");         }
 		if(res.n() != 2)			 {err("operator* test (r-value, scalar) [dimension]");}
 		if(std::abs(ref[0]-res[0]) > 1e-15 ||
@@ -356,7 +356,7 @@ int main()
 		Matrix<double> ref = {2,{6.2, 10.4, 18.6, 15.0}};
 		Matrix<double> res = 2.0 * std::move(a); 
 		if(a.size()   != 0)          { err("operator* test (scalar, r-value) [src size]");     }
-		if(a.n() != 2)				 				{err("operator* test (scalar, r-value) [src dimension]");}
+		if(a.n() != 0)				 				{err("operator* test (scalar, r-value) [src dimension]");}
 		if(res.size() != 4)          { err("operator* test (scalar, r-value) [size]");         }
 		if(res.n() != 2)			 			{err("operator* test (scalar, r-value) [dimension]");}
 		if(std::abs(ref[0]-res[0]) > 1e-15 ||
@@ -400,7 +400,7 @@ int main()
 		Matrix<double> ref = {2,{1.55, 2.6, 4.65, 3.75}};
 		Matrix<double> res = std::move(a) / 2.0;
 		if(a.size()   != 0)          { err("operator/ test (r-value, scalar) [src size]"); }
-		if(a.n() != 2)				{err("operator/ test (r-value, scalar) [src dimension]");}
+		if(a.n() != 0)				{err("operator/ test (r-value, scalar) [src dimension]");}
 		if(res.size() != 4)          { err("operator/ test (r-value, scalar) [size]");     }
 		if(res.n() != 2)			 {err("operator/ test (r-value, scalar) [dimension]");}
 		if(std::abs(ref[0]-res[0]) > 1e-15 ||
@@ -437,7 +437,7 @@ int main()
 		Matrix<double> ref = {2,{44.47, 17.72, 74.28, 41.01}};
 		Matrix<double> res = std::move(a) * b;
 		if(a.size() != 0)                             { err("mu test (r-value, l-value) [src size]");     }
-		if(a.n() != 2)								  {err("mu test (r-value, l-value) [src dimension]");}
+		if(a.n() != 0)								  {err("mu test (r-value, l-value) [src dimension]");}
 		if(b.size() != 4)                             { err("mu test (r-value, l-value) [src size]");     }
 		if(b.n() != 2)								  {err("mu test (r-value, l-value) [src dimension]");}
 		if(res.size() != 4)          				  { err("mu test (r-value, l-value) [size]");     }
@@ -458,7 +458,7 @@ int main()
 		if(a.size() != 4)                             { err("mu test (l-value, r-value) [src size]");     }
 		if(a.n() != 2)								  {err("mu test (l-value, r-value) [src dimension]");}
 		if(b.size() != 0)                             { err("mu test (l-value, r-value) [src size]");     }
-		if(b.n() != 2)								  {err("mu test (l-value, r-value) [src dimension]");}
+		if(b.n() != 0)								  {err("mu test (l-value, r-value) [src dimension]");}
 		if(res.size() != 4)          				  { err("mu test (l-value, r-value) [size]");     }
 		if(res.n() != 2)							  {err("mu test (l-value, r-value) [dimension]");}
 		if(a[0] != 3.1 || a[1] != 5.2 || a[2] != 9.3 || a[3] != 7.5){ err("mu test (l-value, r-value) [src elements]"); }
@@ -475,7 +475,7 @@ int main()
 		Matrix<double> ref = {2,{44.47, 17.72, 74.28, 41.01}};
 		Matrix<double> res = std::move(a) * std::move(b);
 		if(a.size() != 0)                             { err("mu test (r-value, r-value) [src size]");     }
-		if(a.n() != 2)								  {err("mu test (r-value, r-value) [src dimension]");}
+		if(a.n() != 0)								  {err("mu test (r-value, r-value) [src dimension]");}
 		if(b.size() != 4)                             { err("mu test (r-value, r-value) [src size]");     }
 		if(b.n() != 2)								  {err("mu test (r-value, r-value) [src dimension]");}
 		if(res.size() != 4)          				  { err("mu test (r-value, r-value) [size]");     }
@@ -531,3 +531,4 @@ int main()
     std::cout << "All tests are successful!\n";
 	return 0;
 }
+
