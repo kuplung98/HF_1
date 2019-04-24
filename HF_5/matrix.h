@@ -61,7 +61,14 @@ public:
 
 	//Default, Copy and Move constructors implemented by the compiler:
 	Matrix( Matrix const& ) = default;
-	Matrix( Matrix && ) = default;
+	Matrix( Matrix && m)
+	{
+		N=m.n();
+		data.resize(sq(N));
+		data = m.data;
+		m.N=0;
+		m.data.resize(0);
+	}
 	Matrix():N{0}
     {
         data.resize(sq(N));
@@ -69,7 +76,15 @@ public:
 
 	//Copy and Move assignment operators implemented by the compiler:
 	Matrix<T>& operator=(Matrix const&) = default;
-	Matrix<T>& operator=(Matrix &&) = default;
+	Matrix<T>& operator=(Matrix && m)
+	{
+		N=m.n();
+		data.resize(sq(N));
+		data = m.data;
+		m.N=0;
+		m.data.resize(0);
+		return *this;
+	}
 
 	//Constructs from function :
 	template<typename F>
@@ -293,21 +308,21 @@ public:
 	Matrix<T>&& operator*(Matrix<T> && m1, Matrix<T> const& m2)
 	{
 		int N = m1.n();
-		std::vector<T> v(m2.size());
-		for(int i=0;i<=N-1;i++)
+		std::vector<T> v(N);
+		for(int i=0;i<N;i++)
     	{
-        	for(int j=0;j<=N-1;j++)
+        	for(int j=0;j<N;j++)
         	{
 				T sum = 0.0;
 				for(int k = 0; k<N; ++k)
 				{
-					sum += m1[N*i+k] * m2[k*N+j];
+					sum += m1(i, k) * m2(k, j);
 				}
 				v[j]=sum;
 			}
-			for(int j=0;j<=N-1;j++)
+			for(int j=0;j<N;j++)
 			{
-				m1[N*i+j]=v[j];
+				m1(i, j)=v[j];
 			}
 		}
 		return std::move(m1);	
@@ -317,26 +332,25 @@ public:
 	Matrix<T>&& operator*(Matrix<T> const& m1, Matrix<T> && m2)
 	{
 		int N = m2.n();
-		std::vector<T> v(m1.size());
-		for(int i=0;i<=N-1;i++)
+		std::vector<T> v(N);
+		for(int i=0;i<N;i++)
     	{
-        	for(int j=0;j<=N-1;j++)
+        	for(int j=0;j<N;j++)
         	{
 				T sum = 0.0;
 				for(int k = 0; k<N; ++k)
 				{
-					sum += m1[N*i+k] * m2[k*N+j];
+					sum += m1(j, k) * m2(k, i);
 				}
-				v[N*i+j]=sum;
+				v[j]=sum;
 			}
+		
+			for(int j=0;j<N;j++)
+			{
+				m2(j, i)=v[j];
+			}
+
 		}
-		for(int i=0;i<=N-1;i++)
-    	{
-        	for(int j=0;j<=N-1;j++)
-        	{
-				m2[N*i+j]=v[N*i+j];
-			}
-		}	
 		return std::move(m2);
 	}
 
@@ -344,21 +358,21 @@ public:
 	Matrix<T>&& operator*(Matrix<T> && m1, Matrix<T> && m2)
 	{
 		int N = m1.n();
-		std::vector<T> v(m2.size());
-		for(int i=0;i<=N-1;i++)
+		std::vector<T> v(N);
+		for(int i=0;i<N;i++)
     	{
-        	for(int j=0;j<=N-1;j++)
+        	for(int j=0;j<N;j++)
         	{
 				T sum = 0.0;
 				for(int k = 0; k<N; ++k)
 				{
-					sum += m1[N*i+k] * m2[k*N+j];
+					sum += m1(i, k) * m2(k, j);
 				}
 				v[j]=sum;
 			}
-			for(int j=0;j<=N-1;j++)
+			for(int j=0;j<N;j++)
 			{
-				m1[N*i+j]=v[j];
+				m1(i, j)=v[j];
 			}
 		}
 		return std::move(m1);
@@ -403,11 +417,13 @@ public:
 		{
 			std::getline(ss, tmp, ','); 
 			if(tmp.size() == 0){ s.seekg(pos); s.setstate(state); return s; }
-			m.data[i] = std::stod(tmp);
+			std::stringstream dat(tmp);
+			dat>>m.data[i];
 		}
 		std::getline(ss, tmp);
 		if(tmp.size() == 0){ s.seekg(pos); s.setstate(state); return s; }
-		m.data[n-1] = std::stod(tmp);
+		std::stringstream dat1(tmp);
+		dat1>>m.data[n-1];
 		
 		return s;
 	
