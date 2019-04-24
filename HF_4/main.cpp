@@ -134,21 +134,24 @@ int main(int, char**) {
     Vector2<double> V3={2.3, 5.1 };
     Vector2<double> V4={7.5, 13.7 };
     {
-		std::string str("2.3,5.1");
-		std::stringstream oo1;
-		oo1 << V3;
-		std::string o1 = oo1.str();
-		bool b = o1 == str;
-		if(b != true){std::cout << "Incorrect ostream! \n\n"; };
-	}
+	std::string str("2.3,5.1");
+        Vector2<double> p;
+	std::stringstream oo1;
+	oo1 << V3;
+	std::string o1 = oo1.str();
+	bool b = o1 == str;
+	if(b != true){std::cout << "Incorrect ostream! \n\n"; };
+        oo1 >> p;
+	if(std::abs(V3.x-p.x) > 1e-10 || std::abs(V3.y-p.y) > 1e-10 ){ std::cout << "Incorrect istream! \n\n";    }
+     }
 
-	{
-		std::string str("7.5,13.7");
-		std::stringstream oo1(str);
-		Vector2<double> p;
-		oo1 >> p;
-		if(std::abs(V4.x-p.x) > 1e-10 || std::abs(V4.y-p.y) > 1e-10 ){ std::cout << "Incorrect istream! \n\n";    }
-	}
+     {
+	std::string str("7.5,13.7");
+	std::stringstream oo1(str);
+	Vector2<double> p;
+	oo1 >> p;
+	if(std::abs(V4.x-p.x) > 1e-10 || std::abs(V4.y-p.y) > 1e-10 ){ std::cout << "Incorrect istream! \n\n";    }
+      }
 
 
     return 0;
