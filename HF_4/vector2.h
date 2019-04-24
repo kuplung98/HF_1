@@ -112,16 +112,16 @@ std::istream& operator>> (std::istream& s, Vector2<T> & v)
 		
 		std::getline(s, tmp, ','); 
 		if(tmp.size() == 0){ s.seekg(pos); s.setstate(state); return s; }
-		v.x = std::stod(tmp);
+		std::stringstream vx(tmp);
+        vx>>v.x;
 
         std::getline(s, tmp); 
         if(tmp.size() == 0){ s.seekg(pos); s.setstate(state); return s; }
-        v.y = std::stod(tmp);
+        std::stringstream vy(tmp);
+        vy>>v.y;
 
         std::stringstream ss(tmp);
 		
 		return s;
 	
 	}
-
-
