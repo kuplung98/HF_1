@@ -68,8 +68,8 @@ public:
 	Matrix( Matrix && m)
 	{
 		N=m.n();
-		data.resize(sq(N));
-		data = m.data;
+		//data.resize(sq(N));
+		data =std::move(m.data);
 		m.N=0;
 		m.data.resize(0);
 	}
@@ -382,38 +382,39 @@ public:
 		return std::move(m1);
 	}
 
-	
-
 	// parallel multiplication:
 	friend
 	Matrix<T> parallel(Matrix<T> const&  m1, Matrix<T> const& m2)
     {
 	int N=m1.n();
-
-	 auto mu=[&](int i,int j,int it0,int it1){
-		 T sum = 0.0;
-		 for(int k=it0;k<it1;k++) 
-		 {
-		 	sum+=m1(i,k)*m2(k,j);
-		 }
-		return sum;};
-
-        auto mu_par=[&](int i,int j){
-			int max_num_of_threads= (int)std::thread::hardware_concurrency();
+	Matrix<T> res;
+	res.data.resize(sq(N));
+	res.N = N;
+	int max_num_of_threads=(int)std::thread::hardware_concurrency();
             
-            std::vector<std::future<double>> futures(max_num_of_threads);
+            std::vector<std::future<void>> futures(max_num_of_threads);
             for(int n=0;n<max_num_of_threads;n++){
 			  int it0=n*N/max_num_of_threads;
               int it1=(n+1)*N/max_num_of_threads;
-    		  futures[n]=std::async(mu,i,j,it0,it1);}
-        	  auto parallel_result=std::accumulate(futures.begin(),futures.end(),0.0,
-			  [](double acc,std::future<double>& f){return acc+f.get();});
-            return parallel_result;
-			};
-        
-		return Matrix<T>(Idx2{}, mu_par, N);
-
+			  futures[n]=std::async(std::launch::async,
+			  [&res, m1, m2, N](int it0, int it1){
+			  for(int i=it0;i<it1;i++)
+    		  {
+				for(int j=0;j<N;j++)
+				{
+					T sum = 0.0;
+					for(int k = 0; k<N; ++k)
+					{
+						sum += m1(i, k) * m2(k, j);
+					}
+					res(i,j)=sum;
+				}
+			  }
+			  },it0, it1 );
+			}
+		return res;
 	}
+
 	
 
 	// ostream
