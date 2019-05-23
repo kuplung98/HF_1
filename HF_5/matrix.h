@@ -66,7 +66,6 @@ public:
 		N=m.n();
 		data = std::move(m.data);
 		m.N=0;
-		m.data.resize(0);
 	}
 	Matrix():N{0}
     {
@@ -80,7 +79,6 @@ public:
 		N=m.n();
 		data = std::move(m.data);
 		m.N=0;
-		m.data.resize(0);
 		return *this;
 	}
 
