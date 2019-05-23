@@ -68,7 +68,6 @@ public:
 	Matrix( Matrix && m)
 	{
 		N=m.n();
-		//data.resize(sq(N));
 		data =std::move(m.data);
 		m.N=0;
 		m.data.resize(0);
@@ -83,8 +82,7 @@ public:
 	Matrix<T>& operator=(Matrix && m)
 	{
 		N=m.n();
-		data.resize(sq(N));
-		data = m.data;
+		data = std::move(m.data);
 		m.N=0;
 		m.data.resize(0);
 		return *this;
@@ -397,7 +395,7 @@ public:
 			  int it0=n*N/max_num_of_threads;
               int it1=(n+1)*N/max_num_of_threads;
 			  futures[n]=std::async(std::launch::async,
-			  [&res, m1, m2, N](int it0, int it1){
+			  [&res, &m1, &m2, N](int it0, int it1){
 			  for(int i=it0;i<it1;i++)
     		  {
 				for(int j=0;j<N;j++)
