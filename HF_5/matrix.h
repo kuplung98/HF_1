@@ -64,8 +64,8 @@ public:
 	Matrix( Matrix && m)
 	{
 		N=m.n();
-		data.resize(sq(N));
-		data = m.data;
+		//data.resize(sq(N));
+		data = std::move(m.data);
 		m.N=0;
 		m.data.resize(0);
 	}
@@ -79,8 +79,8 @@ public:
 	Matrix<T>& operator=(Matrix && m)
 	{
 		N=m.n();
-		data.resize(sq(N));
-		data = m.data;
+		//data.resize(sq(N));
+		data = std::move(m.data);
 		m.N=0;
 		m.data.resize(0);
 		return *this;
